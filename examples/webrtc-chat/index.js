@@ -4,11 +4,7 @@ console.log(stunServer);
 let socket = new WebSocket(`${stunServer}`);
 let myName = "";
 let target = "";
-let peerConnection = new RTCPeerConnection({
-  iceServers: [
-    { urls: 'stun:stun.services.mozilla.com:3478' },
-  ],
-});
+let peerConnection = new RTCPeerConnection();
 
 let channel ;
 
