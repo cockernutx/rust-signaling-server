@@ -92,11 +92,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for SignalSocket {
     ) {
         match message {
             Ok(ws::Message::Close(_)) => {
-                println!("close request received. closing.");
+                logln!(info => "close request received. closing.");
                 context.stop();
             }
             Ok(ws::Message::Text(text_message)) => {
-                println!("{}", text_message.to_string());
+                logln!("{}", text_message.to_string());
                 match serde_json::from_str(&text_message) {
                     Ok(signal) => {
                         block_on(self.handle_signal_message(signal, context))
