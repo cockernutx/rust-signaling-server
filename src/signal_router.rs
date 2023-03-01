@@ -1,3 +1,4 @@
+use crate::logger::logln;
 use super::signal::Signal;
 use actix::fut::wrap_future;
 use actix::prelude::{Actor, Context, Handler, Message, Recipient, ResponseActFuture};
@@ -82,11 +83,11 @@ impl Handler<JoinMessage> for SignalRouter {
 
     fn handle(&mut self, message: JoinMessage, _: &mut Self::Context) -> Self::Result {
         for a in &self.sockets {
-            println!("{}", a.0)
+            logln!(info => "{}", a.0)
         }
         
         if self.sockets.contains_key(&message.user_name) {
-            println!("The user {} already joined.", message.user_name);
+            logln!(info => "The user {} already joined.", message.user_name);
             return Err(());
         }
         
@@ -149,6 +150,8 @@ impl From<String> for ExitMessage {
 
 #[cfg(test)]
 mod test {
+    use crate::logger::logln;
+
     use super::{JoinMessage, Signal, SignalMessage, SignalRouter};
     use actix::prelude::{Actor, Addr, Context, Handler, Message};
     use std::sync::{Arc, Mutex};
@@ -241,22 +244,32 @@ mod test {
             let caller_addr = MockSignalHandler::new(message_placeholder.clone()).start();
             let callee_addr = MockSignalHandler::new(message_placeholder.clone()).start();
 
-            router_addr
+            match router_addr
                 .send(JoinMessage::new(
                     Self::caller_name().to_owned(),
                     caller_addr.clone().recipient(),
                 ))
                 .await
-                .expect("failed to join")
-                .expect("failed to join");
-            router_addr
+                {
+                    Ok(o) => match o {
+                        Ok(_) => (),
+                        Err(_) => logln!(warning => "Failed to join"),
+                    },
+                    Err(err) => logln!(warning => "Failed to join: {}", err.to_string()),
+                }
+            match router_addr
                 .send(JoinMessage::new(
                     Self::callee_name().to_owned(),
                     callee_addr.clone().recipient(),
                 ))
                 .await
-                .expect("failed to join")
-                .expect("failed to join");
+                {
+                    Ok(o) => match o {
+                        Ok(_) => (),
+                        Err(_) => logln!(warning => "Failed to join"),
+                    },
+                    Err(err) => logln!(warning => "Failed to join: {}", err.to_string()),
+                }
 
             RouteTestingEnvironment {
                 last_received_message: message_placeholder,

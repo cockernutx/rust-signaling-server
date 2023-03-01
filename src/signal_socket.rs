@@ -2,6 +2,8 @@ use actix::prelude::{Actor, ActorContext, Addr, AsyncContext, Handler, StreamHan
 use actix_web_actors::ws;
 use futures::executor::block_on;
 
+use crate::logger::logln;
+
 use super::{Error, ExitMessage, JoinMessage, Signal, SignalMessage, SignalRouter};
 
 pub struct SignalSocket {
@@ -54,10 +56,10 @@ impl Actor for SignalSocket {
             match  res {
                 Ok(_) => {
                     context.text(serde_json::to_string(&Signal::assign(self.user_name.clone())).unwrap());
-                    println!("Signal Socket Opened")
+                    logln!(info => "Signal Socket Opened")
                 },
                 Err(_) => {
-                    println!("Signal Socket Closed");
+                    logln!(info => "Signal Socket Closed");
 
                     context.text(serde_json::to_string(&ErrorMessage::from(Error::UserAlreadyJoined(self.user_name.clone()))).unwrap());
                     context.stop();
@@ -75,9 +77,9 @@ impl Actor for SignalSocket {
             .send(ExitMessage::from(self.user_name.clone()));
 
         if block_on(exiting_router_fut).is_ok() {
-            println!("Signal Socket Closed")
+            logln!(info => "Signal Socket: {} Closed", self.user_name.clone())
         } else {
-            eprintln!("couldn't exit from router. user name: {}", self.user_name)
+            logln!(error => "couldn't exit from router. user name: {}", self.user_name)
         }
     }
 }
@@ -100,15 +102,15 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for SignalSocket {
                         block_on(self.handle_signal_message(signal, context))
                     },
                     Err(err) => {
-                        eprintln!("could not parse the message. {}", err.to_string());
+                        logln!(error => "could not parse the message. {}", err.to_string());
                         context.text(format!("could not parse the message. {}", err.to_string()))
                     },
                 }
             } 
             Ok(_) => {
-                println!("some message received.");
+                logln!(info => "some message received.");
             }
-            Err(error) => eprintln!("error occurred during receive message: {}", error),
+            Err(error) => logln!(error => "error occurred during receive message: {}", error),
         }
     }
 }

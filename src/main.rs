@@ -7,11 +7,13 @@ use std::sync::Arc;
 use error::Error;
 use signal::Signal;
 use signal_router::{ExitMessage, JoinMessage, SignalMessage, SignalRouter};
+
 mod error;
 mod signal;
 mod signal_router;
 mod signal_socket;
 mod server;
+mod logger;
 
 type SignalServerStateData = web::Data<Arc<SignalServerState>>;
 
@@ -29,6 +31,10 @@ impl SignalServerState {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+
+    logger::logln!(warning => "{}", 2);
+    logger::logln!(info => "{}", 2);
+
     let server_fut = async {
         let signal_router = SignalRouter::default();
         let signal_router_addr = signal_router.start();
