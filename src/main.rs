@@ -32,9 +32,6 @@ impl SignalServerState {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
 
-    logger::logln!(warning => "{}", 2);
-    logger::logln!(info => "{}", 2);
-
     let server_fut = async {
         let signal_router = SignalRouter::default();
         let signal_router_addr = signal_router.start();

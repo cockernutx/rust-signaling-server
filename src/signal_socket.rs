@@ -56,10 +56,10 @@ impl Actor for SignalSocket {
             match  res {
                 Ok(_) => {
                     context.text(serde_json::to_string(&Signal::assign(self.user_name.clone())).unwrap());
-                    logln!(info => "Signal Socket Opened")
+                    logln!(info => "Signal Socket: {} Opened", self.user_name.clone())
                 },
                 Err(_) => {
-                    logln!(info => "Signal Socket Closed");
+                    logln!(warning => "Signal Socket: {} Closed unexpectedly", self.user_name.clone());
 
                     context.text(serde_json::to_string(&ErrorMessage::from(Error::UserAlreadyJoined(self.user_name.clone()))).unwrap());
                     context.stop();
