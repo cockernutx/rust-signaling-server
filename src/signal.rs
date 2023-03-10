@@ -24,12 +24,14 @@ pub struct SessionDescriptionMessage {
 pub struct IceCandidate {
     pub target: String,
     candidate: String,
+    pub name: String,
 }
 
 impl Signal {
     pub fn assign(user_name: String) -> Signal {
         Signal::Assign(user_name)
     }
+
 }
 
 impl Message for Signal {

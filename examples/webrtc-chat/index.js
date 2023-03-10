@@ -16,7 +16,8 @@ peerConnection.onicecandidate = (e) => {
     let iceCandidate = {
       type: "new_ice_candidate",
       target: target,
-      candidate: JSON.stringify(e.candidate)
+      candidate: JSON.stringify(e.candidate.candidate),
+      name: myName
     }
   
     socket.send(JSON.stringify(iceCandidate))

@@ -80,11 +80,13 @@ impl<'de> Visitor<'de> for IceCandidateVisitor {
     fn visit_map<M: MapAccess<'de>>(self, mut map: M) -> Result<Self::Value, M::Error> {
         let mut target: Result<String, M::Error> = Err(M::Error::missing_field("target"));
         let mut candidate: Result<String, M::Error> = Err(M::Error::missing_field("candidate"));
+        let mut name: Result<String, M::Error> = Err(M::Error::missing_field("name"));
 
         while let Some((key, value)) = map.next_entry()? {
             match key {
                 "target" => target = Ok(value),
                 "candidate" => candidate = Ok(value),
+                "name" => name = Ok(value),
                 _ => continue,
             }
         }
@@ -92,6 +94,7 @@ impl<'de> Visitor<'de> for IceCandidateVisitor {
         Ok(IceCandidate {
             target: target?.to_owned(),
             candidate: candidate?.to_owned(),
+            name: name?.to_owned()
         })
     }
 }
@@ -154,11 +157,12 @@ fn test_deserializing_answer_signal() {
 fn test_deserializing_new_ice_candidate_signal() {
     use super::IceCandidate;
 
-    let new_ice_candidate_text = r#"{"type":"new_ice_candidate","target":"4fe681ad-aba1-4732-89df-ee784b7d4abf","candidate":"candidate"}"#;
+    let new_ice_candidate_text = r#"{"type":"new_ice_candidate","name":"3872379c-4743-4a7d-b2ee-79cf7368cf58","target":"4fe681ad-aba1-4732-89df-ee784b7d4abf","candidate":"candidate"}"#;
 
     let new_ice_candidate_struct = Signal::NewIceCandidate(IceCandidate {
         target: "4fe681ad-aba1-4732-89df-ee784b7d4abf".to_owned(),
         candidate: "candidate".to_owned(),
+        name: "3872379c-4743-4a7d-b2ee-79cf7368cf58".to_owned()
     });
 
     assert_eq!(

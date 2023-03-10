@@ -26,6 +26,7 @@ impl Serialize for Signal {
                 map.serialize_entry("type", "new_ice_candidate")?;
                 map.serialize_entry("target", &ice_candidate.target)?;
                 map.serialize_entry("candidate", &ice_candidate.candidate)?;
+                map.serialize_entry("name", &ice_candidate.name)?;
                 map.end()
             }
             Signal::Assign(user_name) => {
@@ -81,6 +82,7 @@ fn test_serializing_new_ice_candidate_signal() {
     let new_ice_candidate_struct = Signal::NewIceCandidate(IceCandidate {
         target: "4fe681ad-aba1-4732-89df-ee784b7d4abf".to_owned(),
         candidate: "candidate".to_owned(),
+        name: "3872379c-4743-4a7d-b2ee-79cf7368cf58".to_owned()
     });
 
     let ice_candidate_text = r#"{"type":"new_ice_candidate","target":"4fe681ad-aba1-4732-89df-ee784b7d4abf","candidate":"candidate"}"#;
