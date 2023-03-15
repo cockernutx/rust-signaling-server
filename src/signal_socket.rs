@@ -99,7 +99,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for SignalSocket {
                 let text_message = message.to_string();
                 logln!(info => "{}", text_message);
 
-                match serde_json::from_str(&text_message) {
+                match Signal::from_string(&text_message) {
                     Ok(signal) => {
                         block_on(self.handle_signal_message(signal, context))
                     },

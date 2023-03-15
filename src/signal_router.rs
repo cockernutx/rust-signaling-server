@@ -165,7 +165,7 @@ mod test {
             RouteTestingEnvironment::caller_name(),
             RouteTestingEnvironment::callee_name()
         );
-        let offer_signal: Signal = serde_json::from_str(&signal_text).unwrap();
+        let offer_signal = Signal::from_string(&signal_text).unwrap();
 
         //when
         let signal_result = testing_env
@@ -188,7 +188,7 @@ mod test {
             RouteTestingEnvironment::caller_name(),
             RouteTestingEnvironment::callee_name()
         );
-        let offer_signal: Signal = serde_json::from_str(&signal_text).unwrap();
+        let offer_signal = Signal::from_string(&signal_text).unwrap();
 
         //when
         testing_env
