@@ -15,19 +15,21 @@ peerConnection.onicecandidate = (e) => {
   if (e.candidate) {
     let iceCandidate = {
       type: "new_ice_candidate",
-      target: target,
-      candidate: JSON.stringify(e.candidate.candidate),
-      name: myName
+      data: {
+        target: target,
+        candidate: JSON.stringify(e.candidate.candidate),
+        name: myName
+      }
     }
-  
+
     socket.send(JSON.stringify(iceCandidate))
   }
 }
 
 peerConnection.onconnectionstatechange = (state) => {
-  if(peerConnection.iceConnectionState === "connected") {
+  if (peerConnection.iceConnectionState === "connected") {
     alert("Connection open! You can now send messages.")
-    
+
   }
 
 }
@@ -37,10 +39,6 @@ peerConnection.ondatachannel = event => {
   assingChannelFunctions()
 };
 
-socket.onopen = function (e) {
-
-};
-
 socket.onmessage = function (event) {
   console.log("Received data from server: " + event.data);
   let data = JSON.parse(event.data);
@@ -48,8 +46,8 @@ socket.onmessage = function (event) {
 
   switch (data.type) {
     case "assign":
-      myName = data.name;
-      document.getElementById("name").innerText = `You name is: ${data.name}`;
+      myName = data.data.name;
+      document.getElementById("name").innerText = `You name is: ${myName}`;
       break;
     case "offer":
       sendAnswer(data);
@@ -78,9 +76,8 @@ socket.onerror = function (error) {
 };
 
 async function sendOffer() {
-  const dataChannelParams = {ordered: true};
+  const dataChannelParams = { ordered: true };
   channel = peerConnection.createDataChannel('messaging-channel', dataChannelParams);
-  channel.binaryType = 'arraybuffer';
   assingChannelFunctions()
   target = document.getElementById("target").value;
   let offerOptions = {
@@ -94,9 +91,11 @@ async function sendOffer() {
   let sdp = offer.sdp;
   let offerWithTarget = JSON.stringify({
     type: offer.type,
-    name: myName,
-    target: target,
-    sdp: sdp
+    data: {
+      name: myName,
+      target: target,
+      sdp: sdp
+    }
 
   });
 
@@ -110,20 +109,26 @@ async function sendOffer() {
 
 async function sendAnswer(offer) {
 
-  target = offer.name;
+  target = offer.data.name;
 
   let offerOptions = {
 
   };
-  await peerConnection.setRemoteDescription(offer);
+  await peerConnection.setRemoteDescription({
+    type: offer.type,
+    target: offer.data.target,
+    sdp: offer.data.sdp
+  });
   let answer = await peerConnection.createAnswer();
   await peerConnection.setLocalDescription(answer)
 
   let answerWithTarget = JSON.stringify({
     type: answer.type,
-    name: myName,
-    target: target,
-    sdp: answer.sdp
+    data: {
+      name: myName,
+      target: target,
+      sdp: answer.sdp
+    }
 
   });
 
@@ -133,15 +138,20 @@ async function sendAnswer(offer) {
 }
 
 async function handleAnswer(data) {
-  await peerConnection.setRemoteDescription(data);
-  
+  await peerConnection.setRemoteDescription({
+    type: data.type,
+    target: data.data.target,
+    sdp: data.data.sdp
+  });
+
 
 }
 
 async function addIceCandidate(data) {
-  let candidate = JSON.parse(data.candidate);
+  let candidate = JSON.parse(data.data.candidate);
   await peerConnection.addIceCandidate(candidate);
 }
+
 
 function assingChannelFunctions() {
   channel.onopen = (ev) => {
