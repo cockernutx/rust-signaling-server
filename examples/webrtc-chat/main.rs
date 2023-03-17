@@ -1,9 +1,3 @@
-//! Run with
-//!
-//! ```not_rust
-//! cargo run -p example-static-file-server
-//! ```
-
 use axum::{
     Router,
 };
