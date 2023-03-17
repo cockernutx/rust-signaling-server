@@ -1,5 +1,4 @@
-use super::Error;
-use actix::Message;
+use super::error::Error;
 use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -9,6 +8,7 @@ pub enum Signal {
     Answer(SessionDescriptionMessage),
     NewIceCandidate(IceCandidate),
     Assign(AssignName),
+    Error(Error)
     
 }
 
@@ -59,8 +59,4 @@ impl Signal {
             }
         };
     }*/
-}
-
-impl Message for Signal {
-    type Result = Result<(), Error>;
 }

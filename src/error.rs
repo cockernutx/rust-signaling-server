@@ -1,6 +1,9 @@
-#[derive(Debug)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Error {
-    ParseError(serde_json::Error),
+    ParseError(String),
     ConnectionClosed,
     ConnectionTimeout,
     TargetNotFound(String),
@@ -11,7 +14,7 @@ pub enum Error {
 
 impl From<serde_json::Error> for Error {
     fn from(err: serde_json::Error) -> Error {
-        Self::ParseError(err)
+        Self::ParseError(err.to_string())
     }
 }
 
@@ -33,11 +36,3 @@ impl std::fmt::Display for Error {
     }
 }
 
-impl std::error::Error for Error {
-    fn cause(&self) -> Option<&dyn std::error::Error> {
-        match self {
-            Self::ParseError(err) => Some(err),
-            _ => None,
-        }
-    }
-}

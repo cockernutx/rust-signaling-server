@@ -7,17 +7,18 @@ edition = "2021"
 
 [dev-dependencies]
 actix-files = "0.6.2"
+tower-http = { version = "0.4.0", features = ["fs", "trace"] }
 
 [dependencies]
-futures = "0.3.1"
-actix-web = "4.3.0"
-actix = "0.13.0"
-actix-web-actors = "4.2.0"
-serde_json = "1.0.93"
+axum = {version = "0.6.11", features = ["ws"]}
+serde_json = "1.0.94"
+tokio = {version = "1.26.0", features = ["full"]}
 serde = {varsion = "1.0.152", features = ["derive"]}
-actix-rt = "2.8.0"
+tower = {version = "0.4.13", features = ["util"]}
+futures = "0.3.27"
 uuid = {version ="1.3.0", features = ["v4"]}
-derive_more = "0.99.17"
-chrono = "0.4.23"
+chrono = "0.4.24"
+
+
 
 
