@@ -1,29 +1,28 @@
-use actix_files::NamedFile;
-use actix_web::{HttpRequest, Result};
-use std::path::PathBuf;
+use axum::{
+    Router,
+};
+use std::net::SocketAddr;
+use tower_http::{
+    services::{ServeDir},
+    trace::TraceLayer,
+};
 
-fn example_path() -> String { 
-    format!("{}/{}", env!("CARGO_MANIFEST_DIR").to_owned(), "examples/webrtc-chat/")
+#[tokio::main]
+async fn main() {
+
+        serve(using_serve_dir(), 3001).await;
 }
 
-async fn index(_req: HttpRequest) -> Result<NamedFile> {
-    let mut path = PathBuf::from(example_path());
-    path.push("index.html");
-    Ok(NamedFile::open(path)?)
+fn using_serve_dir() -> Router {
+    // serve the file in the "assets" directory under `/assets`
+    Router::new().nest_service("/", ServeDir::new(format!("{}/{}", env!("CARGO_MANIFEST_DIR"), "examples/webrtc-chat")))
 }
 
-async fn file(req: HttpRequest) -> Result<NamedFile> {
-    let mut path = PathBuf::from(example_path());
-    path.push(req.match_info().query("filename"));
-    Ok(NamedFile::open(path)?)
-}
+async fn serve(app: Router, port: u16) {
+    let addr = SocketAddr::from(([127, 0, 0, 1], port));
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    use actix_web::{web, App, HttpServer};
-
-    HttpServer::new(|| App::new().route("/", web::get().to(index)).route("/{filename:.*}", web::get().to(file)))
-        .bind(("127.0.0.1", 8080))?
-        .run()
+    axum::Server::bind(&addr)
+        .serve(app.layer(TraceLayer::new_for_http()).into_make_service())
         .await
+        .unwrap();
 }
