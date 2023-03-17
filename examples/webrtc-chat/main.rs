@@ -15,7 +15,7 @@ async fn main() {
 
 fn using_serve_dir() -> Router {
     // serve the file in the "assets" directory under `/assets`
-    Router::new().nest_service("/", ServeDir::new("./"))
+    Router::new().nest_service("/", ServeDir::new(format!("{}/{}", env!("CARGO_MANIFEST_DIR"), "examples/webrtc-chat")))
 }
 
 async fn serve(app: Router, port: u16) {

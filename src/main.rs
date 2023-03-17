@@ -97,8 +97,16 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, username: String) {
     let state_clone = Arc::clone(&state);
     let username_clone = username.clone();
     let mut recv_task = tokio::spawn(async move {
-        while let Some(Ok(Message::Text(text))) = receiver.next().await {
-            handle_msg(text.clone(), username_clone.clone(), &state_clone);
+        while let Some(Ok(m)) = receiver.next().await {
+            match m {
+                Message::Text(msg) => handle_msg(msg.clone(), username_clone.clone(), &state_clone),
+                Message::Binary(_) => error_handler(Error::ServiceUnavailable, username_clone.clone(), &state_clone),
+                Message::Close(_) => {
+                    let _ = &state_clone.user_set.lock().unwrap().remove(&username_clone.clone());
+                },
+                _ => {}
+            }
+            ;
         }
     });
     let _ = state.user_set.lock().unwrap().get_mut(&username).unwrap().send(Signal::assign(username.clone()));

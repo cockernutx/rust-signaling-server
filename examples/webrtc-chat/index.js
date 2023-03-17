@@ -17,7 +17,7 @@ peerConnection.onicecandidate = (e) => {
       type: "new_ice_candidate",
       data: {
         target: target,
-        candidate: JSON.stringify(e.candidate.candidate),
+        candidate: JSON.stringify(e.candidate),
         name: myName
       }
     }
