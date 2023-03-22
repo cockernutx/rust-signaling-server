@@ -10,7 +10,7 @@ use axum::{
 use error::Error;
 use futures::{
     sink::SinkExt,
-    stream::{ StreamExt},
+    stream::{StreamExt},
 };
 use std::{
     collections::{HashMap},

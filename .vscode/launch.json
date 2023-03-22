@@ -40,6 +40,43 @@
             },
             "args": [],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'webrtc-chat'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=webrtc-chat",
+                    "--package=signaling-server"
+                ],
+                "filter": {
+                    "name": "webrtc-chat",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'webrtc-chat'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=webrtc-chat",
+                    "--package=signaling-server"
+                ],
+                "filter": {
+                    "name": "webrtc-chat",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
