@@ -8,8 +8,8 @@ pub enum Signal {
     Answer(SessionDescriptionMessage),
     NewIceCandidate(IceCandidate),
     Assign(AssignName),
-    Error(Error)
-    
+    Error(Error),
+    ConnectedList(Vec<String>)
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
