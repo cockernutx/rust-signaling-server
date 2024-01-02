@@ -1,5 +1,10 @@
 use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
 
+macro_rules! read_names {
+    ($file:expr $(,)?) => {
+        include_str!($file).split_whitespace().collect()
+    };
+}
 
 /// A naming strategy for the `Generator`
 pub enum Name {
@@ -64,13 +69,13 @@ impl<'a> Generator<'a> {
     /// println!("My new name is: {}", generator.next().unwrap());
     /// ```
     pub fn with_naming(naming: Name) -> Self {
-        Generator::new(include_str!("../names/adjectives.txt").split_whitespace().collect(), include_str!("../names/nouns.txt").split_whitespace().collect(), naming)
+        Generator::new(read_names!("../names/adjectives.txt"), read_names!("../names/nouns.txt"), naming)
     }
 }
 
 impl<'a> Default for Generator<'a> {
     fn default() -> Self {
-        Generator::new(include_str!("../names/adjectives.txt").split_whitespace().collect(), include_str!("../names/nouns.txt").split_whitespace().collect(), Name::default())
+        Generator::new(read_names!("../names/adjectives.txt"), read_names!("../names/nouns.txt"), Name::default())
     }
 }
 
