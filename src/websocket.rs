@@ -14,6 +14,7 @@ use futures::{sink::SinkExt, stream::StreamExt};
 use tokio::sync::broadcast;
 
 use crate::AppState;
+use crate::name_generator;
 
 pub fn ws_routes() -> Router<Arc<AppState>> {
     Router::new()
@@ -37,13 +38,13 @@ async fn websocket_handler(
     State(state): State<Arc<AppState>>,
 ) -> impl IntoResponse {
     let shared_state = Arc::clone(&state);
-    let mut uuid_str = uuid::Uuid::new_v4().to_string();
-    let user_set = shared_state.user_set.lock().unwrap();
-    while user_set.contains_key(&uuid_str) {
-        uuid_str = uuid::Uuid::new_v4().to_string();
-    }
 
-    let username = uuid_str.clone();
+    let mut nm_generator = name_generator::Generator::default();
+    let mut username = nm_generator.next().unwrap();
+    let user_set = shared_state.user_set.lock().unwrap();
+    while user_set.contains_key(&username) {
+        username = nm_generator.next().unwrap();
+    }
 
     ws.on_upgrade(|socket| websocket(socket, state, username))
 }
@@ -57,17 +58,6 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, username: String) {
     let (tx, mut rx) = broadcast::channel(1024);
     state.user_set.lock().unwrap().insert(username.clone(), tx);
 
-    {
-        let state_clone = state.user_set.lock().unwrap().clone();
-        let keys = state_clone
-            .keys()
-            .map(|f| f.clone())
-            .collect::<Vec<String>>();
-        for user in state_clone.iter() {
-            let _ = user.1.send(Signal::ConnectedList(keys.clone()));
-        }
-    }
-    
     // Spawn the first task that will receive broadcast messages and send text
     // messages over the websocket to our client.
     let mut send_task = tokio::spawn(async move {
@@ -99,6 +89,7 @@ async fn websocket(stream: WebSocket, state: Arc<AppState>, username: String) {
                         .lock()
                         .unwrap()
                         .remove(&username_clone.clone());
+                    
                 }
                 _ => {}
             };

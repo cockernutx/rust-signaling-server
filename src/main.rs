@@ -1,6 +1,6 @@
 
 use std::{
-    collections::{HashMap},
+    collections::HashMap,
     net::SocketAddr,
     sync::{Arc, Mutex},
 };
@@ -13,6 +13,7 @@ mod error;
 mod logger;
 mod signal;
 mod websocket;
+mod name_generator;
 
 struct AppState {
     // We require unique usernames. This tracks which usernames have been taken.
