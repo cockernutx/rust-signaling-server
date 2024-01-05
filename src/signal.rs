@@ -2,7 +2,7 @@ use super::error::Error;
 use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-#[serde(tag = "type", content = "data", rename_all = "kebab-case")]
+#[serde(tag = "type", content = "data", rename_all = "camelCase")]
 pub enum Signal {
     Offer(SessionDescriptionMessage),
     Answer(SessionDescriptionMessage),

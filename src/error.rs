@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(tag = "errorType", content = "data", rename_all = "camelCase")]
 pub enum Error {
     ParseError(String),
     ConnectionClosed,
