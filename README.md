@@ -1,6 +1,6 @@
 # A signaling server written in rust
 
-This is a simple signaling server written in rust
+An WEBRTC signaling server written in rust
 
 ## Running
 
